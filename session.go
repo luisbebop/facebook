@@ -213,7 +213,7 @@ func (session *Session) makeRequest(url string, params Params) ([]byte, error) {
     }
 
 	var response *http.Response
-	r, ok := params["http_request"]
+	r, ok := params["http_request"].(*http.Request)
 	if ok {
 	    c := appengine.NewContext(r)
 		client := urlfetch.Client(c)
