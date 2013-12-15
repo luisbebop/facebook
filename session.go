@@ -15,6 +15,8 @@ import (
     "io"
     "net/http"
     "strings"
+    "appengine"
+    "appengine/urlfetch"
 )
 
 // Makes a facebook graph api call.
@@ -210,8 +212,16 @@ func (session *Session) makeRequest(url string, params Params) ([]byte, error) {
         return nil, fmt.Errorf("cannot encode params. %v", err)
     }
 
-    response, err := http.Post(url, mime, buf)
-
+	var response *http.Response
+	r, ok := params["http_request"]
+	if ok {
+	    c := appengine.NewContext(r)
+		client := urlfetch.Client(c)
+		response, err = client.Post(url, mime, buf)
+	} else {
+		response, err = http.Post(url, mime, buf)
+	}
+	
     if err != nil {
         return nil, fmt.Errorf("cannot reach facebook server. %v", err)
     }
